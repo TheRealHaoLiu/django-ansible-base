@@ -4,10 +4,20 @@ from django.apps import AppConfig
 from django.db.models import TextField, signals
 from django.db.models.functions import Cast
 from django.db.utils import IntegrityError
+from django.db import connection
+
+from django.db.migrations.executor import MigrationExecutor
+
 
 import ansible_base.lib.checks  # noqa: F401 - register checks
 
 logger = logging.getLogger('ansible_base.resource_registry.apps')
+
+
+def migrations_are_complete():
+    executor = MigrationExecutor(connection)
+    plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
+    return not bool(plan)
 
 
 def initialize_resources(sender, **kwargs):
@@ -28,6 +38,10 @@ def initialize_resources(sender, **kwargs):
     # `django-admin flush` is called seems like a bad idea, since that will prevent the
     # resource types from being initialized in the database, so a direct import appears to be
     # better than doing nothing.
+
+    if not migrations_are_complete():
+        logger.info('Not running resource_registry post_migrate because migrations are incomplete')
+        return
 
     apps = kwargs.get("apps")
     if apps is None:
