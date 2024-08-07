@@ -1,13 +1,11 @@
 import logging
 
 from django.apps import AppConfig
+from django.db import connection
+from django.db.migrations.executor import MigrationExecutor
 from django.db.models import TextField, signals
 from django.db.models.functions import Cast
 from django.db.utils import IntegrityError
-from django.db import connection
-
-from django.db.migrations.executor import MigrationExecutor
-
 
 import ansible_base.lib.checks  # noqa: F401 - register checks
 
