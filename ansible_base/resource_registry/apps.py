@@ -1,21 +1,14 @@
 import logging
 
 from django.apps import AppConfig
-from django.db import connection
-from django.db.migrations.executor import MigrationExecutor
 from django.db.models import TextField, signals
 from django.db.models.functions import Cast
 from django.db.utils import IntegrityError
 
 import ansible_base.lib.checks  # noqa: F401 - register checks
+from ansible_base.lib.utils.db import migrations_are_complete
 
 logger = logging.getLogger('ansible_base.resource_registry.apps')
-
-
-def migrations_are_complete():
-    executor = MigrationExecutor(connection)
-    plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
-    return not bool(plan)
 
 
 def initialize_resources(sender, **kwargs):
