@@ -10,6 +10,9 @@ def reset_service_id(apps, schema_editor):
     Resource = apps.get_model("dab_resource_registry", "Resource")
     Resource.objects.all().update(service_id=ServiceID.objects.first().id)
 
+def set_service_id_to_dummy_uuid(apps, schema_editor):
+    Resource = apps.get_model("dab_resource_registry", "Resource")
+    Resource.objects.all().update(service_id='xxxxxx')
 
 class Migration(migrations.Migration):
 
@@ -30,7 +33,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(
             code=reset_service_id,
-            reverse_code=migrations.RunPython.noop
+            reverse_code=set_service_id_to_dummy_uuid,
         ),
         migrations.AlterField(
             model_name='resource',
